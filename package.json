@@ -1,0 +1,64 @@
+{
+  "name": "dsh-plugin-opencode-go-usage",
+  "version": "1.0.0",
+  "description": "DeepSeek Harness (DSH) plugin: live OpenCode Go subscription usage (rolling 5h, weekly and monthly windows) beside the composer, with a click-open detail card. DSH 插件：在输入框下方实时查看 OpenCode Go 套餐额度用量。",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "opencode",
+    "opencode-go",
+    "usage",
+    "quota"
+  ],
+  "license": "MIT",
+  "author": "keyblues",
+  "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keyblues/dsh-plugin-opencode-go-usage.git"
+  },
+  "homepage": "https://github.com/keyblues/dsh-plugin-opencode-go-usage#readme",
+  "bugs": {
+    "url": "https://github.com/keyblues/dsh-plugin-opencode-go-usage/issues"
+  },
+  "scripts": {
+    "validate": "node scripts/validate.mjs",
+    "prepublishOnly": "npm run validate"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-conversation"
+      ]
+    }
+  }
+}

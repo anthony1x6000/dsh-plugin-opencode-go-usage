@@ -1,0 +1,6 @@
+# Insert the OpenCode Go usage bundle: the Host half polls the usage API and
+# serves one same-origin JSON route; the Client half renders the meter in
+# `conversation.composer.dock`.
+- insert:
+    - id: opencode-go-usage
+      name: 'dsh-plugin-opencode-go-usage'
