@@ -1,8 +1,6 @@
 # dsh-plugin-opencode-go-usage
 
-[![npm](https://img.shields.io/npm/v/dsh-plugin-opencode-go-usage.svg)](https://www.npmjs.com/package/dsh-plugin-opencode-go-usage)
-[![license](https://img.shields.io/npm/l/dsh-plugin-opencode-go-usage.svg)](LICENSE)
-[![CI](https://github.com/keyblues/dsh-plugin-opencode-go-usage/actions/workflows/ci.yml/badge.svg)](https://github.com/keyblues/dsh-plugin-opencode-go-usage/actions/workflows/ci.yml)
+[![license](https://img.shields.io/github/license/keyblues/dsh-plugin-opencode-go-usage.svg)](LICENSE)
 
 DeepSeek Harness（DSH）插件：在 Harness Web UI 里实时查看 OpenCode Go 套餐额度用量。
 
@@ -124,20 +122,18 @@ API Key 只在 Host 进程内使用，浏览器只能拿到固定同源 JSON 路
 ## 开发与发布
 
 ```bash
-npm run validate        # 清单 / 语法 / locale / 图标 / 令牌 自检
-npm pack --dry-run      # 看 tarball 内容
-git tag v1.0.0 && git push origin v1.0.0
+npm run validate        # 清单 / 语法 / locale / 图标 / 样式令牌 自检
+npm pack --dry-run      # 预览将发布的 tarball 内容
 ```
 
-发布到 npm 有两种方式：
+发布到 npm（包名 `dsh-plugin-opencode-go-usage` 已确认可用）：
 
-1. **本地发布**：`npm login` 后 `npm publish --access public`（`prepublishOnly` 会先跑自检）。
-2. **GitHub Actions 自动发布（已配好）**：在仓库 `Settings → Secrets and variables → Actions`
-   里加一个 `NPM_TOKEN`（npm 账号的 Automation token），然后在 GitHub 上发布一个 Release
-   （或手动运行 `Publish to npm` 工作流）。工作流会用 `--provenance` 发布并带上来源证明。
+```bash
+npm login
+npm publish --access public     # prepublishOnly 会先跑 npm run validate
+```
 
-CI（`.github/workflows/ci.yml`）在每次 push / PR 时跑 `node scripts/validate.mjs` 与
-`npm pack --dry-run`。
+发布后安装侧即可用 `plugin_manager install_bundle` + `dsh-plugin-opencode-go-usage`（或带版本）。
 
 ## License
 
