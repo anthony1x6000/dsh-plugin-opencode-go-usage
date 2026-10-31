@@ -2,10 +2,11 @@
  * Client half of the OpenCode Go usage bundle.
  *
  * Renders a compact, self-refreshing meter in `conversation.composer.dock`
- * beside the shipped activity and usage pills. All numbers come from the
- * Host half's same-origin route, so the API key never reaches the page.
- * Clicking the pill opens a detail card, matching the neighbouring context
- * and session-stats meters.
+ * beside the shipped activity and usage pills, but only while the Session's
+ * active model is `opencode-go`; other providers unmount it entirely. All
+ * numbers come from the Host half's same-origin route, so the API key never
+ * reaches the page. Clicking the pill opens a detail card, matching the
+ * neighbouring context and session-stats meters.
  */
 window.__ModuleLoader__.load({
   id: 'dsh-plugin-opencode-go-usage',
@@ -17,6 +18,8 @@ window.__ModuleLoader__.load({
     const NS = 'opencode-go-usage';
     /** Must stay in sync with ROUTE_PATH in index.js: the Host registers this exact path. */
     const ROUTE = '/opencode-go-usage.json';
+    /** The only provider whose models draw down the OpenCode Go plan. */
+    const OPENCODE_GO_PROVIDER = 'opencode-go';
     const POLL_MS = 20000;
     const WINDOW_KEYS = ['rolling', 'weekly', 'monthly'];
     const PANEL_MARGIN = 12;
@@ -144,6 +147,19 @@ window.__ModuleLoader__.load({
       if (percent >= 90) return 'danger';
       if (percent >= 70) return 'warn';
       return 'ok';
+    }
+
+    /**
+     * Effective model selection: a pending pick wins, otherwise the model of
+     * the last request. Null before either selects a model in this Session.
+     */
+    function activeModelSelection(selection) {
+      return selection?.next ?? selection?.lastUsed ?? null;
+    }
+
+    /** Whether the active model is served by the OpenCode Go provider. */
+    function selectionUsesOpenCode(selection) {
+      return activeModelSelection(selection)?.provider === OPENCODE_GO_PROVIDER;
     }
 
     /** Compact duration for a reset countdown, localized by the caller. */
@@ -491,6 +507,17 @@ window.__ModuleLoader__.load({
       return { state, load };
     }
 
+    /**
+     * Mount the meter only for the OpenCode Go provider. Returning null
+     * unmounts the meter body, so its polling effect stops and an open detail
+     * card is discarded when the Session switches to another model.
+     */
+    function OpenCodeGoUsageGate(props) {
+      const modelSelection = props.useProjection('modelSelection');
+      if (!selectionUsesOpenCode(modelSelection)) return null;
+      return h(OpenCodeGoUsageMeter, props);
+    }
+
     /** The compact meter itself. */
     function OpenCodeGoUsageMeter(props) {
       const t = React.useMemo(() => makeTranslator(props?.t), [props?.t]);
@@ -706,7 +733,7 @@ window.__ModuleLoader__.load({
             order: 2,
             locale: NS,
           },
-          OpenCodeGoUsageMeter,
+          OpenCodeGoUsageGate,
         ),
       );
     }
@@ -714,6 +741,7 @@ window.__ModuleLoader__.load({
     return {
       inject: ['slots'],
       apply,
+      selectionUsesOpenCode,
     };
   },
 });
