@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- The composer-dock meter now mounts only while the Session's active model is
+  `opencode-go`. Picking another provider unmounts it, which stops polling and
+  closes an open detail card; a new Session shows nothing until a model is
+  selected or a turn runs.
+
 ## 1.0.0 — 2026-10-26
 
 First public release.

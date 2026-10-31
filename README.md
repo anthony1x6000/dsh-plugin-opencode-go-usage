@@ -4,12 +4,15 @@
 
 DeepSeek Harness（DSH）插件：在 Harness Web UI 里实时查看 OpenCode Go 套餐额度用量。
 
-在输入框下方（`conversation.composer.dock`）加入一个常驻用量条，显示 OpenCode Go 订阅的三个
-额度窗口：
+在输入框下方（`conversation.composer.dock`）加入一个用量条，仅当前会话的模型属于
+`opencode-go` 提供商时显示，展示 OpenCode Go 订阅的三个额度窗口：
 
 - `5h` — 5 小时滚动窗口
 - `本周` — 每周窗口
 - `本月` — 每月窗口
+
+在模型下拉里新选中 `opencode-go`（还没发消息）就会立即出现；切到其它提供商时整条卸载，
+停止轮询，已打开的详情卡片也一并关闭。全新会话在明确选择模型或跑过一轮之前不显示。
 
 每个窗口显示一个小圆环进度 + 已用百分比（环形样式与输入框下方「上下文占用」圆环一致，14px
 viewBox、2px 描边，颜色同样用 `--dsw-alias-label-tertiary`）；达到 70% 变黄、90% 变红。
@@ -113,15 +116,17 @@ API Key 只在 Host 进程内使用，浏览器只能拿到固定同源 JSON 路
 | 文件 | 作用 |
 |---|---|
 | `index.js` | Host 半：解析 Key、调用用量接口、注册同源 JSON 路由（按需刷新、合并并发） |
-| `client.js` | 浏览器半：dock 圆环用量条 + 点击弹出的详情卡片，轮询路由、主题令牌样式、中英文本 |
+| `client.js` | 浏览器半：dock 圆环用量条 + 点击弹出的详情卡片，仅在 `opencode-go` 会话挂载，轮询路由、主题令牌样式、中英文本 |
 | `cordis.patch.yml` | 插入 `opencode-go-usage` 主机行 |
 | `locale/*.json` | 插件管理器里显示的标题与说明 |
 | `icon.svg` | 插件图标（原创） |
 | `scripts/validate.mjs` | 打包自检：清单、语法、locale、图标、样式令牌 |
+| `test/model-gate.test.mjs` | 离线断言：只认 `opencode-go`、隐藏即卸载、dock 注册契约 |
 
 ## 开发与发布
 
 ```bash
+npm test                # 浏览器半离线断言：模型门控与 dock 注册契约
 npm run validate        # 清单 / 语法 / locale / 图标 / 样式令牌 自检
 npm pack --dry-run      # 预览将发布的 tarball 内容
 ```

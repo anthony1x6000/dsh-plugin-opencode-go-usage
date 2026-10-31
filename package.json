@@ -39,6 +39,7 @@
     "url": "https://github.com/keyblues/dsh-plugin-opencode-go-usage/issues"
   },
   "scripts": {
+    "test": "node --test test/model-gate.test.mjs",
     "validate": "node scripts/validate.mjs",
     "prepublishOnly": "npm run validate"
   },
