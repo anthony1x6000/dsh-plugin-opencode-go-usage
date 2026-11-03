@@ -20,7 +20,17 @@ DeepSeek Harness（DSH）插件：在 Web UI 输入框下方实时显示 OpenCod
 
 ## 安装
 
-### 从 npm 安装（推荐）
+### 一行安装（推荐）
+
+```bash
+dsh plugin --profile web add "github:anthony1x6000/dsh-plugin-opencode-go-usage#main"
+```
+
+需要 `dsh` CLI 与 `pnpm`；把 `web` 换成实际使用的 profile。命令会把 bundle 写进该 profile 的 `dsh.profile.bundles`，有 HMR 时立即生效，否则重启 `dsh web`。
+
+> npm 上的 `dsh-plugin-opencode-go-usage` 由上游发布，不含本 fork 的模型门控；要装本 fork 的代码请用上面这条。
+
+### 从 npm 安装（上游版本）
 
 已发布到 npm：[`dsh-plugin-opencode-go-usage`](https://www.npmjs.com/package/dsh-plugin-opencode-go-usage)。
 
