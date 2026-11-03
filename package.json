@@ -1,6 +1,6 @@
 {
   "name": "dsh-plugin-opencode-go-usage",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "DeepSeek Harness (DSH) plugin: live OpenCode Go subscription usage (rolling 5h, weekly and monthly windows) beside the composer, with a click-open detail card. DSH 插件：在输入框下方实时查看 OpenCode Go 套餐额度用量。",
   "keywords": [
     "dsh",

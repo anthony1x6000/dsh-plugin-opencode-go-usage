@@ -28,7 +28,7 @@ DeepSeek Harness（DSH）插件：在 Web UI 输入框下方实时显示 OpenCod
 ```text
 plugin_manager install_bundle  target: dsh-plugin-opencode-go-usage
 # 或固定版本
-plugin_manager install_bundle  target: dsh-plugin-opencode-go-usage@1.0.0
+plugin_manager install_bundle  target: dsh-plugin-opencode-go-usage@1.0.1
 ```
 
 ### 从 GitHub Release 安装（离线、固定版本）
