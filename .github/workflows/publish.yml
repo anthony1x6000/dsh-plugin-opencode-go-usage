@@ -1,0 +1,55 @@
+name: publish
+
+# Publishes the bundle to npm when a `v*` tag is pushed, using npm Trusted
+# Publishing (OIDC): no npm token is stored in the repository. Requires the
+# package to exist on npm with this repository + workflow configured under
+# Settings → Trusted Publishing.
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write # create the GitHub release and upload the tarball
+  id-token: write # OIDC token for npm provenance / trusted publishing
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+
+      # Trusted publishing needs an npm CLI with OIDC support.
+      - name: Use the latest npm
+        run: npm install -g npm@latest
+
+      - name: Tag must match package.json version
+        run: |
+          set -euo pipefail
+          VERSION=$(node -p "require('./package.json').version")
+          if [ "v$VERSION" != "${GITHUB_REF_NAME}" ]; then
+            echo "::error::tag ${GITHUB_REF_NAME} does not match package.json version v$VERSION"
+            exit 1
+          fi
+
+      - name: Validate the package
+        run: node scripts/validate.mjs
+
+      - name: Publish to npm (provenance, trusted publishing)
+        run: npm publish --provenance --access public
+
+      - name: Attach the tarball to the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          VERSION=$(node -p "require('./package.json').version")
+          TAG="v$VERSION"
+          npm pack --pack-destination /tmp
+          gh release view "$TAG" >/dev/null 2>&1 || gh release create "$TAG" --title "$TAG" --generate-notes
+          gh release upload "$TAG" "/tmp/dsh-plugin-opencode-go-usage-$VERSION.tgz" --clobber

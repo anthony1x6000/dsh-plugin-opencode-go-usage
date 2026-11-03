@@ -7,6 +7,16 @@
   closes an open detail card; a new Session shows nothing until a model is
   selected or a turn runs.
 
+## 1.0.1 — 2026-11-03
+
+Docs and packaging only; no runtime changes.
+
+- README: npm and GitHub Release badges, separate install paths for npm / GitHub
+  Release tarball / local development, and an English summary.
+- Added `.github/workflows/publish.yml`: pushing a `v*` tag publishes to npm via
+  OIDC trusted publishing (provenance) and attaches the tarball to the release.
+- Recorded the npm publication and the trusted-publisher setup in the README.
+
 ## 1.0.0 — 2026-10-26
 
 First public release.
