@@ -21,6 +21,8 @@ DeepSeek Harness（DSH）插件：在 Web UI 输入框下方实时显示 OpenCod
 
 ### 从 npm 安装（推荐）
 
+已发布到 npm：[`dsh-plugin-opencode-go-usage`](https://www.npmjs.com/package/dsh-plugin-opencode-go-usage)。
+
 在 Harness 里用插件管理器安装这个 bundle，target 写 npm 包名（可带版本）：
 
 ```text
@@ -127,18 +129,18 @@ npm pack --dry-run      # 预览将发布的 tarball 内容
 
 发布到 npm 走 GitHub 联动：`.github/workflows/publish.yml` 在推送 `v*` tag 时用 OIDC（npm Trusted Publishing）执行 `npm publish --provenance`，并把打好的 `.tgz` 附到对应的 GitHub Release。
 
-首次发布（包还不存在时 Trusted Publishing 无法配置）：
-
-```bash
-npm login
-npm publish --access public     # prepublishOnly 会先跑 npm run validate
-```
-
-包在 npm 上存在后，在 npmjs.com 包的 **Settings → Trusted Publishing** 添加 GitHub 仓库 `keyblues/dsh-plugin-opencode-go-usage` 与 workflow `publish.yml`；之后每次发版只需：
+Trusted Publishing 已配置（`npm trust github`：仓库 `keyblues/dsh-plugin-opencode-go-usage`、workflow `publish.yml`、权限 publish + stage publish），之后每次发版只需：
 
 ```bash
 npm version patch|minor|major
 git push --follow-tags
+```
+
+首次发布是在包还不存在时手动做的（此时无法配置 Trusted Publishing）：
+
+```bash
+npm login
+npm publish --access public     # prepublishOnly 会先跑 npm run validate
 ```
 
 ## License
