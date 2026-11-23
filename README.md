@@ -1,85 +1,91 @@
 # dsh-plugin-opencode-go-usage
 
-[![npm version](https://img.shields.io/npm/v/dsh-plugin-opencode-go-usage?style=flat-square)](https://www.npmjs.com/package/dsh-plugin-opencode-go-usage)
-[![npm downloads](https://img.shields.io/npm/dw/dsh-plugin-opencode-go-usage?style=flat-square)](https://www.npmjs.com/package/dsh-plugin-opencode-go-usage)
-[![license](https://img.shields.io/github/license/keyblues/dsh-plugin-opencode-go-usage.svg)](LICENSE)
-[![release](https://img.shields.io/github/v/release/keyblues/dsh-plugin-opencode-go-usage?style=flat-square)](https://github.com/keyblues/dsh-plugin-opencode-go-usage/releases)
-
-> **English** — Live OpenCode Go subscription usage for DeepSeek Harness, as a compact meter in the composer dock: the rolling 5-hour, weekly and monthly windows as small rings with used percentages (70% amber, 90% red), plus a click-open detail card with per-window progress bars and reset countdowns. The Host half polls `https://opencode.ai/zen/go/v1/usage` on demand and serves one same-origin JSON route, so the API key never reaches the browser.
-
-DeepSeek Harness（DSH）插件：在 Web UI 输入框下方实时显示 OpenCode Go 套餐三个窗口的用量；仅当前会话的模型属于 `opencode-go` 提供商时挂载。数据来自 OpenCode 官方接口，API Key 只留在 Host 进程内，浏览器拿不到。
-
-## 特性
-
-- **输入框下方用量条**：`conversation.composer.dock` 里三个小圆环（`5h` 滚动 / `本周` / `本月`）加已用百分比；环形样式与输入框下方「上下文占用」圆环一致（14px viewBox、2px 描边、主题 token 上色），70% 变黄、90% 变红
-- **按模型门控**：仅当前会话的模型属于 `opencode-go` 时挂载；在模型下拉里新选中（还没发消息）立即出现，切到其它提供商整条卸载、停止轮询并关闭已打开的详情卡片，全新会话在明确选择模型或跑过一轮之前不显示
-- **点击整条弹出详情卡**：版式照搬官方 `stat-dialog` 卡片，每个窗口一行（窗口名 + 右侧加粗百分比）加额度进度条，再给出重置倒计时与重置时刻；底部是数据来源、更新时间与「刷新」按钮，点外部或 Esc 关闭
-- **静默刷新**：页面每 20 秒读一次同源 JSON 路由（标签页隐藏时暂停），Host 侧最小上游请求间隔 15 秒、多页面共享同一份结果；后台轮询不变暗不闪，偶发失败保留上一次成功读数
-- **Key 不进浏览器**：Host 半按 `配置 → 凭据库 → OpenCode auth.json` 解析 Key 并直接请求上游，浏览器只从 `GET /opencode-go-usage.json` 拿到百分比
-- **零 npm 依赖、无构建步骤**：`npm run validate` 自检清单、语法、locale、图标与样式令牌
-
-## 安装
-
-### 一行安装（推荐）
+Install this fork in one line (requires the `dsh` CLI and `pnpm`):
 
 ```bash
 dsh plugin --profile web add "github:anthony1x6000/dsh-plugin-opencode-go-usage#main"
 ```
 
-需要 `dsh` CLI 与 `pnpm`；把 `web` 换成实际使用的 profile。命令会把 bundle 写进该 profile 的 `dsh.profile.bundles`，有 HMR 时立即生效，否则重启 `dsh web`。
+Replace `web` with the profile you actually use. The command writes the bundle into that profile's `dsh.profile.bundles`; it takes effect immediately with HMR, otherwise restart `dsh web`.
 
-> npm 上的 `dsh-plugin-opencode-go-usage` 由上游发布，不含本 fork 的模型门控；要装本 fork 的代码请用上面这条。
+[![npm version](https://img.shields.io/npm/v/dsh-plugin-opencode-go-usage?style=flat-square)](https://www.npmjs.com/package/dsh-plugin-opencode-go-usage)
+[![npm downloads](https://img.shields.io/npm/dw/dsh-plugin-opencode-go-usage?style=flat-square)](https://www.npmjs.com/package/dsh-plugin-opencode-go-usage)
+[![license](https://img.shields.io/github/license/anthony1x6000/dsh-plugin-opencode-go-usage.svg)](LICENSE)
+[![release](https://img.shields.io/github/v/release/anthony1x6000/dsh-plugin-opencode-go-usage?style=flat-square)](https://github.com/anthony1x6000/dsh-plugin-opencode-go-usage/releases)
 
-### 从 npm 安装（上游版本）
+Live OpenCode Go subscription usage for DeepSeek Harness, as a compact meter in the composer dock: the rolling 5-hour, weekly and monthly windows as small rings with used percentages (70% amber, 90% red), plus a click-open detail card with per-window progress bars and reset countdowns. The Host half polls `https://opencode.ai/zen/go/v1/usage` on demand and serves one same-origin JSON route, so the API key never reaches the browser. The meter mounts only while the Session's active model belongs to the `opencode-go` provider.
 
-已发布到 npm：[`dsh-plugin-opencode-go-usage`](https://www.npmjs.com/package/dsh-plugin-opencode-go-usage)。
+## Features
 
-在 Harness 里用插件管理器安装这个 bundle，target 写 npm 包名（可带版本）：
+- **Composer-dock meter**: three small rings (`5h` rolling / `Week` / `Month`) with used percentages in `conversation.composer.dock`; the ring styling matches the "context usage" ring under the composer (14px viewBox, 2px stroke, theme token colors), amber at 70%, red at 90%.
+- **Model gating**: mounts only while the Session's active model belongs to `opencode-go`; a model just picked in the dropdown (before sending) shows immediately, switching to another provider unmounts the whole strip, stops polling and closes an open detail card, and a fresh Session shows nothing until a model is explicitly selected or a turn runs.
+- **Click the whole strip for a detail card**: the layout mirrors the official `stat-dialog` card, one row per window (window name + right-aligned bold percentage) with quota progress bars, plus reset countdowns and reset times; the footer shows the data source, update time and a "Refresh" button, and it closes on an outside click or Esc.
+- **Silent refresh**: the page reads the same-origin JSON route every 20 seconds (paused while the tab is hidden); the Host enforces a 15-second minimum upstream interval and shares one result across pages; background polling never dims or flashes, and a transient failure keeps the last good reading.
+- **Key never enters the browser**: the Host resolves the key via `config → credential store → OpenCode auth.json` and calls upstream directly; the browser only receives percentages from `GET /opencode-go-usage.json`.
+- **Zero npm dependencies, no build step**: `npm run validate` self-checks the manifest, syntax, locale, icon and style tokens.
+
+## Install
+
+### One-line install (recommended)
+
+```bash
+dsh plugin --profile web add "github:anthony1x6000/dsh-plugin-opencode-go-usage#main"
+```
+
+Requires the `dsh` CLI and `pnpm`; replace `web` with the profile you actually use. The command writes the bundle into that profile's `dsh.profile.bundles`; it takes effect immediately with HMR, otherwise restart `dsh web`.
+
+> The `dsh-plugin-opencode-go-usage` package on npm is published by upstream and does not include this fork's model gating; to install this fork's code, use the command above.
+
+### Install from npm (upstream version)
+
+Published on npm: [`dsh-plugin-opencode-go-usage`](https://www.npmjs.com/package/dsh-plugin-opencode-go-usage).
+
+In Harness, install this bundle with the plugin manager, using the npm package name as the target (a version is optional):
 
 ```text
 plugin_manager install_bundle  target: dsh-plugin-opencode-go-usage
-# 或固定版本
+# or pin a version
 plugin_manager install_bundle  target: dsh-plugin-opencode-go-usage@1.0.1
 ```
 
-### 从 GitHub Release 安装（离线、固定版本）
+### Install from a GitHub release (offline, pinned)
 
-从 [Releases](https://github.com/keyblues/dsh-plugin-opencode-go-usage/releases) 下载 `dsh-plugin-opencode-go-usage-<version>.tgz`，在插件管理器里填该文件的绝对路径，或：
-
-```text
-plugin_manager install_bundle  target: <下载的 .tgz 绝对路径>
-```
-
-### 从本地目录安装（开发）
+Download `dsh-plugin-opencode-go-usage-<version>.tgz` from [Releases](https://github.com/anthony1x6000/dsh-plugin-opencode-go-usage/releases), then give the plugin manager that file's absolute path, or:
 
 ```text
-plugin_manager install_bundle  target: <本仓库的绝对路径>
+plugin_manager install_bundle  target: <absolute path to the downloaded .tgz>
 ```
 
-安装后立即生效：Host 行激活，浏览器端 bundle 通过 HMR 载入页面（必要时刷新一次页面）。卸载：
+### Install from a local directory (development)
+
+```text
+plugin_manager install_bundle  target: <absolute path to this repository>
+```
+
+Installed changes take effect immediately: the Host row activates and the browser bundle loads into the page via HMR (refresh the page once if needed). Uninstall:
 
 ```text
 plugin_manager remove_bundle  target: dsh-plugin-opencode-go-usage
 ```
 
-要求：DSH 的 Web 组合（包含 `webserver` / `client-modules` / `client-ui-conversation`）。
+Requirement: the DSH web composition (includes `webserver` / `client-modules` / `client-ui-conversation`).
 
-## 使用
+## Usage
 
-用量条大致形态：`Go  5h ◔6%  ·  本周 ◔2%  ·  本月 ◔15%`
+The meter roughly looks like: `Go  5h ◔6%  ·  Week ◔2%  ·  Month ◔15%`
 
-不点击时没有任何悬浮详情；点击整条才弹出详情卡片。卡片宽度 `max-content`，上限 `min(440px, 100vw - 24px)`；明细区两列网格 `minmax(76px,auto) / minmax(0,1fr)`，与旁边「Token 用量」「会话统计」同一套版式。
+There are no hover details; click the whole strip to open the detail card. The card is `max-content` wide, capped at `min(440px, 100vw - 24px)`; the detail area is a two-column grid `minmax(76px,auto) / minmax(0,1fr)`, the same layout as the neighbouring "Token usage" and "Session stats" popovers.
 
-## 数据来源
+## Data source
 
-Host 半调用 OpenCode 官方用量接口：
+The Host half calls the official OpenCode usage endpoint:
 
 ```text
 GET https://opencode.ai/zen/go/v1/usage
 Authorization: Bearer <OpenCode Go API Key>
 ```
 
-返回形如：
+It returns something like:
 
 ```json
 {
@@ -91,71 +97,75 @@ Authorization: Bearer <OpenCode Go API Key>
 }
 ```
 
-`percent` 是**已用百分比**；旧的 `{ rollingUsage, weeklyUsage, monthlyUsage }` 形态也兼容。
+`percent` is the **used percentage**; the older `{ rollingUsage, weeklyUsage, monthlyUsage }` shape is also supported.
 
-API Key 只在 Host 进程内使用，浏览器只能拿到固定同源 JSON 路由（`GET /opencode-go-usage.json`）的百分比数据。该路径是 Host/Client 两半共享的约定（`index.js` 的 `ROUTE_PATH` 与 `client.js` 的 `ROUTE`），刻意不做成配置项。
+The API key is only used inside the Host process; the browser can only read percentages from the fixed same-origin JSON route (`GET /opencode-go-usage.json`). That path is the agreement shared by both halves (`ROUTE_PATH` in `index.js` and `ROUTE` in `client.js`) and is intentionally not configurable.
 
-## API Key 的解析顺序
+## API key resolution order
 
-1. 插件配置里的 `apiKey`（显式写死，不推荐）
-2. Harness 凭据服务中的 `credentialRef`，默认 `OPENCODE_GO_API_KEY`——即 `~/.dsh/.credentials.yaml` 里 `refs.OPENCODE_GO_API_KEY` 这一项
-3. OpenCode 自己保存的登录信息：`~/.local/share/opencode/auth.json` 中的 `opencode-go.key`（若 key 已过期，接口返回 `api_key_expired`，条上显示「API Key 已过期」）
+1. The `apiKey` in the plugin config (hard-coded explicitly, not recommended).
+2. The Harness credential service's `credentialRef`, default `OPENCODE_GO_API_KEY` — i.e. the `refs.OPENCODE_GO_API_KEY` entry in `~/.dsh/.credentials.yaml`.
+3. The login information OpenCode saves itself: `opencode-go.key` in `~/.local/share/opencode/auth.json` (if the key has expired, the API returns `api_key_expired` and the meter shows "API key expired").
 
-## 配置项
+## Configuration
 
-默认无需任何配置。需要调整时，在本 profile 的 `cordis.patch.yml` 里按 id 覆盖：
+No configuration is needed by default. To adjust it, override by id in the profile's `cordis.patch.yml`:
 
 ```yaml
 - id: opencode-go-usage
   name: 'dsh-plugin-opencode-go-usage'
   config:
-    # 直接指定 Key（优先于凭据服务）
+    # Set the key directly (takes priority over the credential service)
     # apiKey: oc_sk_xxx
     credentialRef: OPENCODE_GO_API_KEY
-    # 上游最小请求间隔（毫秒，2000–600000）；调大可减少请求，调小更新更及时
+    # Minimum upstream request interval in milliseconds (2000–600000); raise it to request less, lower it for fresher readings
     minIntervalMs: 15000
-    # OpenCode auth.json 中使用的 provider 名
+    # Provider name used in OpenCode auth.json
     provider: opencode-go
 ```
 
-`minIntervalMs` 是 Host 侧限流，只影响上游请求频率，不影响浏览器每 20 秒的读取。
+`minIntervalMs` is Host-side rate limiting; it only affects upstream request frequency, not the browser's 20-second reads.
 
-## 结构
+## Layout
 
-| 文件 | 作用 |
+| File | Purpose |
 |---|---|
-| `index.js` | Host 半：解析 Key、调用用量接口、注册同源 JSON 路由（按需刷新、合并并发） |
-| `client.js` | 浏览器半：dock 圆环用量条 + 点击弹出的详情卡片，仅在 `opencode-go` 会话挂载，轮询路由、主题令牌样式、中英文本 |
-| `cordis.patch.yml` | 插入 `opencode-go-usage` 主机行 |
-| `locale/*.json` | 插件管理器里显示的标题与说明 |
-| `icon.svg` | 插件图标（原创） |
-| `scripts/validate.mjs` | 打包自检：清单、语法、locale、图标、样式令牌 |
-| `test/model-gate.test.mjs` | 离线断言：只认 `opencode-go`、隐藏即卸载、dock 注册契约 |
+| `index.js` | Host half: resolves the key, calls the usage endpoint, registers the same-origin JSON route (on-demand refresh, coalesced concurrent requests) |
+| `client.js` | Browser half: dock ring meter + click-open detail card, mounts only in `opencode-go` sessions, polls the route, theme-token styling, English strings |
+| `cordis.patch.yml` | Inserts the `opencode-go-usage` host row |
+| `locale/*.json` | Title and description shown in the plugin manager |
+| `icon.svg` | Plugin icon (original) |
+| `scripts/validate.mjs` | Packaging self-check: manifest, syntax, locale, icon, style tokens |
+| `test/model-gate.test.mjs` | Offline assertions: only `opencode-go`, hidden means unmounted, dock registration contract |
 
-## 开发与发布
+## Development and release
 
 ```bash
-npm test                # 浏览器半离线断言：模型门控与 dock 注册契约
-npm run validate        # 清单 / 语法 / locale / 图标 / 样式令牌自检
-npm pack --dry-run      # 预览将发布的 tarball 内容
+npm test                # browser-half offline assertions: model gating and dock registration contract
+npm run validate        # manifest / syntax / locale / icon / style-token self-check
+npm pack --dry-run      # preview the tarball contents
 ```
 
-发布到 npm 走 GitHub 联动：`.github/workflows/publish.yml` 在推送 `v*` tag 时用 OIDC（npm Trusted Publishing）执行 `npm publish --provenance`，并把打好的 `.tgz` 附到对应的 GitHub Release。
+Publishing to npm is wired through GitHub: `.github/workflows/publish.yml` runs `npm publish --provenance` with OIDC (npm Trusted Publishing) when a `v*` tag is pushed, and attaches the resulting `.tgz` to the matching GitHub Release.
 
-Trusted Publishing 已配置（`npm trust github`：仓库 `keyblues/dsh-plugin-opencode-go-usage`、workflow `publish.yml`、权限 publish + stage publish），之后每次发版只需：
+### Publishing (upstream project)
+
+The upstream project has Trusted Publishing configured (`npm trust github`: repository `keyblues/dsh-plugin-opencode-go-usage`, workflow `publish.yml`, permissions publish + stage publish), so each upstream release only needs:
 
 ```bash
 npm version patch|minor|major
 git push --follow-tags
 ```
 
-首次发布是在包还不存在时手动做的（此时无法配置 Trusted Publishing）：
+The first publish happened manually, before the package existed (Trusted Publishing cannot be configured then):
 
 ```bash
 npm login
-npm publish --access public     # prepublishOnly 会先跑 npm run validate
+npm publish --access public     # prepublishOnly runs npm run validate first
 ```
+
+This fork does not publish to npm under the upstream package name; its tags produce GitHub Releases in [anthony1x6000/dsh-plugin-opencode-go-usage](https://github.com/anthony1x6000/dsh-plugin-opencode-go-usage/releases).
 
 ## License
 
-[MIT](LICENSE) © 2026 keyblues
+[MIT](LICENSE) © 2026 keyblues. Forked from [`keyblues/dsh-plugin-opencode-go-usage`](https://github.com/keyblues/dsh-plugin-opencode-go-usage).

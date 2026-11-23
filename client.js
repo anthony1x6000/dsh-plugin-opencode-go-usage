@@ -70,50 +70,6 @@ window.__ModuleLoader__.load({
         'unit.hour': '{n}h',
         'unit.day': '{n}d',
       },
-      zh: {
-        brand: 'Go',
-        'win.rolling': '5h',
-        'win.weekly': '本周',
-        'win.monthly': '本月',
-        loading: '读取中',
-        error: '不可用',
-        'tool.title': 'OpenCode Go 套餐用量',
-        'tool.rolling': '5 小时窗口',
-        'tool.weekly': '本周窗口',
-        'tool.monthly': '本月窗口',
-        'tool.used': '已用',
-        'tool.resets': '重置倒计时',
-        'tool.updated': '更新于',
-        'tool.click': '点击查看详情',
-        'tool.balance': '超出额度后将从 Zen 余额继续计费。',
-        'panel.title': 'OpenCode Go 套餐用量',
-        'panel.resets': '重置倒计时',
-        'panel.resetAt': '重置',
-        'panel.noReset': '接口未返回重置时间',
-        'panel.source': '来源',
-        'panel.source.config': '插件配置',
-        'panel.source.credential': 'Harness 凭据',
-        'panel.source.opencode-auth': 'OpenCode 登录',
-        'panel.source.none': '无',
-        'panel.source.host': 'Host',
-        'panel.refresh': '刷新',
-        'panel.refreshing': '刷新中…',
-        'code.not_configured': '未找到 OpenCode Go API Key',
-        'code.key_expired': 'API Key 已过期',
-        'code.unauthorized': 'API Key 被拒绝',
-        'code.no_subscription': '未订阅 Go 套餐',
-        'code.unavailable': '用量接口不可用',
-        'code.http_error': '用量请求失败',
-        'code.network_error': '网络错误',
-        'code.timeout': '请求超时',
-        'code.unexpected_payload': '响应格式异常',
-        'code.internal_error': 'Host 内部错误',
-        'code.pending': '等待首次读取',
-        'code.host_unreachable': '用量路由不可达',
-        'unit.min': '{n} 分',
-        'unit.hour': '{n} 小时',
-        'unit.day': '{n} 天',
-      },
     };
 
     /** Best-effort locale for the module-level fallback translator. */
@@ -322,7 +278,7 @@ window.__ModuleLoader__.load({
      * The click-open detail card. Metrics (16px padding, 12px/18px type,
      * 76px label column, 6px/16px grid gaps, a 10px title rule) are copied
      * from the shipped stat-dialog card so it sits visually beside the
-     * `Token 用量` and `会话统计` popovers.
+     * `Token usage` and `Session stats` popovers.
      */
     function UsagePanel({ snapshot, phase, busy, t, onRefresh, panelRef, style }) {
       const ready = phase === 'ready' && snapshot && snapshot.ok === true;

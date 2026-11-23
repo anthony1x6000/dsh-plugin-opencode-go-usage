@@ -77,12 +77,10 @@ check('client module id equals the package name', () => {
 });
 
 check('locale metadata', () => {
-  for (const locale of ['en', 'zh']) {
-    const dictionary = readJson(`locale/${locale}.json`);
-    if (!dictionary.meta?.title) throw new Error(`locale/${locale}.json meta.title is empty`);
-    if (!dictionary.meta?.description) throw new Error(`locale/${locale}.json meta.description is empty`);
-  }
-  return 'en + zh';
+  const dictionary = readJson('locale/en.json');
+  if (!dictionary.meta?.title) throw new Error('locale/en.json meta.title is empty');
+  if (!dictionary.meta?.description) throw new Error('locale/en.json meta.description is empty');
+  return 'en';
 });
 
 check('icon', () => {

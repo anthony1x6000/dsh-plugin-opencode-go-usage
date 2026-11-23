@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- English-only: translated the README, the package description and source
+  comments, removed the `zh` client dictionary and `locale/zh.json`, and made
+  the validator check `locale/en.json`.
+- README: the one-line fork install sits at the top; badges, release links and
+  package metadata point at `anthony1x6000/dsh-plugin-opencode-go-usage`.
 - The composer-dock meter now mounts only while the Session's active model is
   `opencode-go`. Picking another provider unmounts it, which stops polling and
   closes an open detail card; a new Session shows nothing until a model is
