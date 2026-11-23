@@ -1,7 +1,7 @@
 {
   "name": "dsh-plugin-opencode-go-usage",
   "version": "1.0.1",
-  "description": "DeepSeek Harness (DSH) plugin: live OpenCode Go subscription usage (rolling 5h, weekly and monthly windows) beside the composer, with a click-open detail card. DSH 插件：在输入框下方实时查看 OpenCode Go 套餐额度用量。",
+  "description": "DeepSeek Harness (DSH) plugin: live OpenCode Go subscription usage (rolling 5h, weekly and monthly windows) beside the composer, mounted only while the session model is opencode-go, with a click-open detail card. The API key stays in the Host process.",
   "keywords": [
     "dsh",
     "dsh-plugin",
@@ -32,11 +32,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/keyblues/dsh-plugin-opencode-go-usage.git"
+    "url": "git+https://github.com/anthony1x6000/dsh-plugin-opencode-go-usage.git"
   },
-  "homepage": "https://github.com/keyblues/dsh-plugin-opencode-go-usage#readme",
+  "homepage": "https://github.com/anthony1x6000/dsh-plugin-opencode-go-usage#readme",
   "bugs": {
-    "url": "https://github.com/keyblues/dsh-plugin-opencode-go-usage/issues"
+    "url": "https://github.com/anthony1x6000/dsh-plugin-opencode-go-usage/issues"
   },
   "scripts": {
     "test": "node --test test/model-gate.test.mjs",
